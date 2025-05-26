@@ -7,6 +7,7 @@ A production-ready Python package for real-time web scraping, content extraction
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/JustM3Sunny/AI_WEB_INFO_RETRIVAL.svg)](https://github.com/JustM3Sunny/AI_WEB_INFO_RETRIVAL/issues)
+[![PyPI version](https://badge.fury.io/py/webinfo-retriever-ai.svg)](https://pypi.org/project/webinfo-retriever-ai/)
 
 ## ✨ Features
 
@@ -38,7 +39,7 @@ A production-ready Python package for real-time web scraping, content extraction
 ### Installation
 
 ```bash
-pip install webinfo-retriever
+pip install webinfo-retriever-ai
 ```
 
 ### Set up your API key
@@ -55,19 +56,19 @@ export GEMINI_API_KEY="your_api_key_here"
 
 ```bash
 # Natural language search
-webinfo-retriever search --fast find me python tutorials
+webinfo-retriever-ai search --fast find me python tutorials
 
 # Comprehensive analysis
-webinfo-retriever search best AI projects on GitHub --output-file report.md
+webinfo-retriever-ai search best AI projects on GitHub --output-file report.md
 
 # Quick search
-webinfo-retriever search --quick React vs Vue comparison
+webinfo-retriever-ai search --quick React vs Vue comparison
 ```
 
 #### Python API
 
 ```python
-from webinfo_retriever import WebInfoRetriever
+from webinfo_retriever-ai import WebInfoRetriever
 
 # Initialize client
 client = WebInfoRetriever()
@@ -98,25 +99,25 @@ result = client.retrieve_and_summarize(
 #### Search Commands
 ```bash
 # Fast search (2-4 seconds)
-webinfo-retriever search --fast [natural language query]
+webinfo-retriever-ai search --fast [natural language query]
 
 # Quick search (basic results)
-webinfo-retriever search --quick [query]
+webinfo-retriever-ai search --quick [query]
 
 # Full analysis (comprehensive report)
-webinfo-retriever search [query] --num-results 15 --output-file report.md
+webinfo-retriever-ai search [query] --num-results 15 --output-file report.md
 ```
 
 #### Single URL Analysis
 ```bash
 # Summarize a webpage
-webinfo-retriever summarize https://example.com
+webinfo-retriever-ai summarize https://example.com
 
 # Answer questions about a webpage
-webinfo-retriever question https://example.com "What is the main topic?"
+webinfo-retriever-ai question https://example.com "What is the main topic?"
 
 # Extract key points
-webinfo-retriever keypoints https://example.com --num-points 5
+webinfo-retriever-ai keypoints https://example.com --num-points 5
 ```
 
 ### Python API Reference
@@ -124,7 +125,7 @@ webinfo-retriever keypoints https://example.com --num-points 5
 #### WebInfoRetriever Class
 
 ```python
-from webinfo_retriever import WebInfoRetriever
+from webinfo_retriever-ai import WebInfoRetriever
 
 client = WebInfoRetriever(api_key="your_key")  # Optional if env var set
 ```
