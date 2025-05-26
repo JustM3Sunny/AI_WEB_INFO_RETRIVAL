@@ -5,11 +5,11 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="webinfo-retriever",
-    version="1.0.0",
+    version="2.0.0",
     author="JustM3Sunny",
     author_email="justaskcoding76@gmail.com",
-    description="Advanced web information retrieval and AI-powered summarization tool with natural language search",
-    long_description="A production-ready Python package for real-time web scraping, content extraction, and AI-powered summarization using Google's Gemini 2.0 Flash model. Features natural language search, intelligent URL discovery, and beautiful markdown reporting.",
+    description="Ultra-fast comprehensive web search and AI-powered analysis with parallel processing and beautiful output formatting",
+    long_description="WebInfo Retriever is a state-of-the-art Python library that provides ultra-fast comprehensive web search and analysis capabilities. It combines advanced AI processing with parallel web scraping to deliver Tavily-like comprehensive answers but faster and more powerful. Features include parallel processing of 25+ sources, streaming results, multi-source synthesis, and beautiful dual-format output.",
     long_description_content_type="text/plain",
     url="https://github.com/JustM3Sunny/AI_WEB_INFO_RETRIVAL",
     packages=find_packages(),

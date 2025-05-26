@@ -120,6 +120,10 @@ Examples:
     search_parser.add_argument("--no-summary", action="store_true", help="Skip executive summary generation")
     search_parser.add_argument("--quick", action="store_true", help="Quick search mode (faster, less detailed)")
     search_parser.add_argument("--fast", action="store_true", help="Super fast search mode (fastest)")
+    search_parser.add_argument("--comprehensive", action="store_true", help="Comprehensive search with multi-source analysis (Tavily-like)")
+    search_parser.add_argument("--ultra-fast", action="store_true", help="Ultra-fast comprehensive search with parallel processing")
+    search_parser.add_argument("--answer-type", choices=["comprehensive", "factual", "comparative", "instructional"],
+                              default="comprehensive", help="Type of answer to generate")
     search_parser.add_argument("--output-file", help="Save markdown report to file")
 
     compare_parser = subparsers.add_parser("compare", help="Compare specific sources for a query")
@@ -177,7 +181,66 @@ Examples:
             # Join query words into natural language query
             user_query = " ".join(args.query)
 
-            if args.fast:
+            if args.ultra_fast:
+                # Ultra-fast comprehensive search mode
+                print(f"🚀 Starting ULTRA-FAST comprehensive search for: {user_query}")
+                print("⚡ Parallel processing with streaming results...")
+
+                response = asyncio.run(client.fast_comprehensive_search(
+                    query=user_query,
+                    num_sources=args.num_results,
+                    output_format="both" if args.output_file else ("json" if args.json else "markdown"),
+                    answer_type=args.answer_type,
+                    stream_results=True
+                ))
+
+                if isinstance(response, dict) and "terminal_output" in response:
+                    # Display clean terminal output
+                    print(response["terminal_output"])
+
+                    if args.output_file:
+                        # Save beautiful HTML/markdown report to file
+                        with open(args.output_file, 'w', encoding='utf-8') as f:
+                            f.write(response["markdown_report"])
+                        print(f"\n📄 Ultra-fast comprehensive report saved to: {args.output_file}")
+                elif isinstance(response, str):
+                    print(response)
+                    if args.output_file:
+                        with open(args.output_file, 'w', encoding='utf-8') as f:
+                            f.write(response)
+                        print(f"\n📄 Report saved to: {args.output_file}")
+                return
+
+            elif args.comprehensive:
+                # Comprehensive search mode (Tavily-like)
+                print(f"🔍 Starting comprehensive search for: {user_query}")
+                print("⚡ Analyzing query, discovering sources, and synthesizing answer...")
+
+                response = asyncio.run(client.comprehensive_search(
+                    query=user_query,
+                    num_sources=args.num_results,
+                    output_format="both" if args.output_file else ("json" if args.json else "markdown"),
+                    answer_type=args.answer_type
+                ))
+
+                if isinstance(response, dict) and "terminal_output" in response:
+                    # Display clean terminal output
+                    print(response["terminal_output"])
+
+                    if args.output_file:
+                        # Save beautiful HTML/markdown report to file
+                        with open(args.output_file, 'w', encoding='utf-8') as f:
+                            f.write(response["markdown_report"])
+                        print(f"\n📄 Comprehensive report saved to: {args.output_file}")
+                elif isinstance(response, str):
+                    print(response)
+                    if args.output_file:
+                        with open(args.output_file, 'w', encoding='utf-8') as f:
+                            f.write(response)
+                        print(f"\n📄 Report saved to: {args.output_file}")
+                return
+
+            elif args.fast:
                 # Super fast search mode
                 response = asyncio.run(client.fast_search(
                     user_query=user_query,

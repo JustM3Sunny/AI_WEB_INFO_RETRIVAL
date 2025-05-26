@@ -10,6 +10,8 @@ from ..core.scraper import WebScraper
 from ..core.content_extractor import ContentExtractor
 from ..core.ai_processor import AIProcessor
 from ..core.response_generator import ResponseGenerator
+from ..core.advanced_search_engine import AdvancedSearchEngine
+from ..core.answer_formatter import AdvancedAnswerFormatter
 from .search_client import SearchClient
 from ..utils.config import Config
 from ..utils.exceptions import WebInfoRetrieverError, ConfigurationError
@@ -51,6 +53,8 @@ class WebInfoRetriever:
             self.ai_processor = AIProcessor(self.config)
             self.response_generator = ResponseGenerator(self.config)
             self.search_client = SearchClient(self.config)
+            self.advanced_search = AdvancedSearchEngine(self.config)
+            self.answer_formatter = AdvancedAnswerFormatter()
 
             logger.info("WebInfo Retriever client initialized successfully")
 
@@ -360,6 +364,118 @@ class WebInfoRetriever:
                 raise
             else:
                 raise WebInfoRetrieverError(f"Intelligent search failed: {str(e)}")
+
+    async def fast_comprehensive_search(
+        self,
+        query: str,
+        num_sources: int = 12,
+        output_format: str = "markdown",
+        answer_type: str = "comprehensive",
+        stream_results: bool = True
+    ) -> Union[str, Dict[str, Any]]:
+        """
+        Ultra-fast comprehensive search with parallel processing and streaming results.
+
+        Args:
+            query: User's search query
+            num_sources: Number of sources to analyze (default: 12)
+            output_format: Output format ("markdown", "json", "text", or "both")
+            answer_type: Type of answer needed (comprehensive, factual, comparative)
+            stream_results: Whether to stream results as they come
+
+        Returns:
+            Comprehensive answer with full detailed analysis and beautiful formatting
+        """
+        try:
+            logger.info(f"🚀 Starting ULTRA-FAST comprehensive search for: {query}")
+
+            # Perform ultra-fast advanced search
+            answer = await self.advanced_search.fast_comprehensive_search(
+                query=query,
+                num_sources=num_sources,
+                include_analysis=True,
+                answer_type=answer_type,
+                stream_results=stream_results
+            )
+
+            # Format response with enhanced styling
+            if output_format == "json":
+                return self.answer_formatter.format_comprehensive_answer(answer, "json")
+            elif output_format == "text":
+                return self.answer_formatter.format_comprehensive_answer(answer, "text")
+            elif output_format == "both":
+                return {
+                    "terminal_output": self.answer_formatter.format_comprehensive_answer(answer, "terminal"),
+                    "markdown_report": self.answer_formatter.format_comprehensive_answer(answer, "markdown_file"),
+                    "json_data": self.answer_formatter.format_comprehensive_answer(answer, "json"),
+                    "quick_summary": self.answer_formatter.create_quick_summary(answer),
+                    "citations": self.answer_formatter.create_citation_list(answer),
+                    "answer_object": answer
+                }
+            else:  # terminal (default)
+                return self.answer_formatter.format_comprehensive_answer(answer, "terminal")
+
+        except Exception as e:
+            logger.error(f"Fast comprehensive search failed: {str(e)}")
+            if isinstance(e, WebInfoRetrieverError):
+                raise
+            else:
+                raise WebInfoRetrieverError(f"Fast comprehensive search failed: {str(e)}")
+
+    async def comprehensive_search(
+        self,
+        query: str,
+        num_sources: int = 12,
+        output_format: str = "markdown",
+        answer_type: str = "comprehensive"
+    ) -> Union[str, Dict[str, Any]]:
+        """
+        Perform comprehensive search with multi-source answer synthesis.
+        Similar to Tavily AI but faster and more advanced.
+
+        Args:
+            query: User's search query
+            num_sources: Number of sources to analyze (default: 12)
+            output_format: Output format ("markdown", "json", "text", or "both")
+            answer_type: Type of answer needed (comprehensive, factual, comparative)
+
+        Returns:
+            Comprehensive answer with detailed analysis and source attribution
+        """
+        try:
+            logger.info(f"Starting comprehensive search for: {query}")
+
+            # Perform advanced search
+            answer = await self.advanced_search.comprehensive_search(
+                query=query,
+                num_sources=num_sources,
+                include_analysis=True,
+                answer_type=answer_type
+            )
+
+            # Format response
+            if output_format == "json":
+                return self.answer_formatter.format_comprehensive_answer(answer, "json")
+            elif output_format == "text":
+                return self.answer_formatter.format_comprehensive_answer(answer, "text")
+            elif output_format == "both":
+                return {
+                    "terminal_output": self.answer_formatter.format_comprehensive_answer(answer, "terminal"),
+                    "markdown_report": self.answer_formatter.format_comprehensive_answer(answer, "markdown_file"),
+                    "json_data": self.answer_formatter.format_comprehensive_answer(answer, "json"),
+                    "quick_summary": self.answer_formatter.create_quick_summary(answer),
+                    "citations": self.answer_formatter.create_citation_list(answer),
+                    "answer_object": answer
+                }
+            else:  # terminal (default)
+                return self.answer_formatter.format_comprehensive_answer(answer, "terminal")
+
+        except Exception as e:
+            logger.error(f"Comprehensive search failed: {str(e)}")
+            if isinstance(e, WebInfoRetrieverError):
+                raise
+            else:
+                raise WebInfoRetrieverError(f"Comprehensive search failed: {str(e)}")
 
     async def fast_search(
         self,

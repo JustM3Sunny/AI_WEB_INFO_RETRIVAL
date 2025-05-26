@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "webinfo-retriever"
-version = "1.0.0"
-description = "Advanced web information retrieval and AI-powered summarization tool"
-authors = [{name = "WebInfo Retriever Team", email = "contact@webinfo-retriever.com"}]
+version = "2.0.0"
+description = "Ultra-fast comprehensive web search and AI-powered analysis with parallel processing"
+authors = [{name = "JustM3Sunny", email = "justaskcoding76@gmail.com"}]
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.8"

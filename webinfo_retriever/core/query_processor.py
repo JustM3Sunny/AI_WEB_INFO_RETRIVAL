@@ -21,7 +21,7 @@ class NaturalQueryProcessor:
         if self.api_key:
             genai.configure(api_key=self.api_key)
             self.model = genai.GenerativeModel(
-                model_name=config.get("ai.model", "gemini-2.0-flash-exp"),
+                model_name=config.get("ai.model", "gemini-2.0-flash"),
                 generation_config={
                     "temperature": 0.1,
                     "max_output_tokens": 200,
