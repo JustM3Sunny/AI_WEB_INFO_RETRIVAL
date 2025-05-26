@@ -75,7 +75,7 @@ from webinfo_retriever import WebInfoRetriever
 
 async def main():
     client = WebInfoRetriever()
-    
+
     # 🚀 Ultra-Fast Comprehensive Search
     result = await client.fast_comprehensive_search(
         query="What are the best Python web frameworks?",
@@ -83,21 +83,21 @@ async def main():
         answer_type="comparative"
     )
     print(result)  # Clean, beautiful terminal output
-    
+
     # 📊 Regular Comprehensive Search
     result = await client.comprehensive_search(
         query="How does React compare to Vue.js?",
         num_sources=10,
         output_format="both"  # Terminal + file output
     )
-    
+
     # 📄 Single URL Analysis
     analysis = client.retrieve_and_summarize(
         url="https://realpython.com/python-web-scraping/",
         query="What are the main web scraping techniques?"
     )
     print(analysis['summary'])
-    
+
     client.close()
 
 asyncio.run(main())
@@ -290,5 +290,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ by JustM3Sunny**  
+**Made with ❤️ by JustM3Sunny**
 *Empowering developers with intelligent web information retrieval*
