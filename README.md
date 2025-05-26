@@ -5,6 +5,7 @@
 [![PyPI version](https://badge.fury.io/py/webinfo-retriever.svg)](https://pypi.org/project/webinfo-retriever/2.1.0/)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://webinfo-retriever.readthedocs.io/)
 [![Downloads](https://pepy.tech/badge/webinfo-retriever)](https://pepy.tech/project/webinfo-retriever)
 
 WebInfo Retriever is a state-of-the-art Python library that provides ultra-fast comprehensive web search and analysis capabilities with **enterprise-level analytics and monitoring**. It combines advanced AI processing with parallel web scraping to deliver Tavily-like comprehensive answers but faster and more powerful.
