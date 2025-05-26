@@ -1,4 +1,4 @@
-***REMEBER ITS A BETA AND TESTING VERSION ITS MANY FEATURES AND UNSTABLE OR NOT WORKING***
+***🚧 REMEMBER: This is a BETA and under active testing. Many features might be unstable, incomplete, or not working yet.***
 
 # 🚀 WebInfo Retriever v2.1.0
 
