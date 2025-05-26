@@ -6,10 +6,15 @@ import argparse
 import json
 import sys
 import asyncio
+import time
+import uuid
 from typing import Dict, Any
+from datetime import datetime
 
 from .api.client import WebInfoRetriever
 from .utils.exceptions import WebInfoRetrieverError
+from .core.analytics_engine import analytics_engine
+from .core.smart_cache import smart_cache
 
 
 def print_json_response(response: Dict[str, Any], indent: int = 2) -> None:
@@ -132,6 +137,26 @@ Examples:
     compare_parser.add_argument("--criteria", nargs="+", default=["Relevance", "Quality", "Category"],
                                help="Comparison criteria")
 
+    # Analytics commands
+    analytics_parser = subparsers.add_parser("analytics", help="View analytics and performance metrics")
+    analytics_parser.add_argument("--export", help="Export analytics to JSON file")
+    analytics_parser.add_argument("--clear", action="store_true", help="Clear analytics data")
+
+    # Cache commands
+    cache_parser = subparsers.add_parser("cache", help="Manage cache")
+    cache_parser.add_argument("--stats", action="store_true", help="Show cache statistics")
+    cache_parser.add_argument("--clear", action="store_true", help="Clear cache")
+
+    # Interactive mode
+    interactive_parser = subparsers.add_parser("interactive", help="Start interactive mode")
+    interactive_parser.add_argument("--analytics", action="store_true", help="Show analytics in interactive mode")
+
+    # Dashboard mode
+    dashboard_parser = subparsers.add_parser("dashboard", help="Start web dashboard")
+    dashboard_parser.add_argument("--host", default="localhost", help="Dashboard host (default: localhost)")
+    dashboard_parser.add_argument("--port", type=int, default=5000, help="Dashboard port (default: 5000)")
+    dashboard_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -177,38 +202,257 @@ Examples:
                 max_concurrent=args.max_concurrent
             )
 
+        elif args.command == "analytics":
+            # Analytics command
+            if args.clear:
+                analytics_engine.search_history.clear()
+                analytics_engine.error_log.clear()
+                print("✅ Analytics data cleared")
+                return
+
+            if args.export:
+                analytics_engine.export_analytics(args.export)
+                print(f"📊 Analytics exported to: {args.export}")
+                return
+
+            # Show analytics
+            stats = analytics_engine.get_performance_stats()
+            trends = analytics_engine.get_search_trends()
+            errors = analytics_engine.get_error_analysis()
+
+            print("\n📊 WEBINFO RETRIEVER ANALYTICS")
+            print("=" * 50)
+            print(f"Total Searches: {stats.total_searches}")
+            print(f"Average Response Time: {stats.avg_response_time:.2f}s")
+            print(f"Success Rate: {stats.success_rate:.1f}%")
+            print(f"Average Confidence: {stats.avg_confidence:.1f}%")
+            print(f"Sources Processed: {stats.total_sources_processed}")
+            print(f"Cache Hit Rate: {stats.cache_hit_rate:.1f}%")
+            print(f"Error Rate: {stats.error_rate:.1f}%")
+            print(f"Uptime: {stats.uptime/3600:.1f} hours")
+
+            if trends['total'] > 0:
+                print(f"\n📈 RECENT TRENDS (24h)")
+                print("-" * 30)
+                print(f"Recent Searches: {trends['total']}")
+                print(f"Peak Hour: {trends['peak_hour']}:00")
+
+                search_types = trends['search_type_distribution']
+                for search_type, count in search_types.items():
+                    print(f"{search_type.title()}: {count}")
+
+            if errors['total_errors'] > 0:
+                print(f"\n❌ ERROR ANALYSIS")
+                print("-" * 20)
+                print(f"Total Errors: {errors['total_errors']}")
+                print(f"Error Rate: {errors['error_rate']:.1f}%")
+
+                for error_type, count in errors['error_types'].items():
+                    print(f"{error_type}: {count}")
+
+            return
+
+        elif args.command == "cache":
+            # Cache command
+            if args.clear:
+                smart_cache.clear()
+                print("✅ Cache cleared")
+                return
+
+            if args.stats:
+                stats = smart_cache.get_stats()
+                print("\n💾 CACHE STATISTICS")
+                print("=" * 30)
+                print(f"Memory Entries: {stats['memory_entries']}")
+                print(f"Memory Size: {stats['memory_size_mb']:.2f} MB")
+                print(f"Max Size: {stats['max_size_mb']:.2f} MB")
+                print(f"Hit Rate: {stats['hit_rate']:.1f}%")
+                print(f"Total Hits: {stats['total_hits']}")
+                print(f"Total Misses: {stats['total_misses']}")
+                print(f"Evictions: {stats['total_evictions']}")
+                return
+
+            # Default: show stats
+            stats = smart_cache.get_stats()
+            print(f"Cache: {stats['memory_entries']} entries, {stats['hit_rate']:.1f}% hit rate")
+            return
+
+        elif args.command == "interactive":
+            # Interactive mode
+            print("🚀 WebInfo Retriever Interactive Mode")
+            print("Type 'help' for commands, 'quit' to exit")
+
+            if args.analytics:
+                stats = analytics_engine.get_performance_stats()
+                print(f"\n📊 Quick Stats: {stats.total_searches} searches, {stats.avg_response_time:.1f}s avg")
+
+            while True:
+                try:
+                    command = input("\nwebinfo> ").strip()
+
+                    if command.lower() in ['quit', 'exit', 'q']:
+                        print("👋 Goodbye!")
+                        break
+
+                    elif command.lower() == 'help':
+                        print("\n📚 Available Commands:")
+                        print("  search <query>     - Perform ultra-fast search")
+                        print("  fast <query>       - Perform fast search")
+                        print("  analyze <url>      - Analyze single URL")
+                        print("  stats              - Show analytics")
+                        print("  cache              - Show cache stats")
+                        print("  clear cache        - Clear cache")
+                        print("  help               - Show this help")
+                        print("  quit/exit/q        - Exit interactive mode")
+
+                    elif command.lower() == 'stats':
+                        stats = analytics_engine.get_performance_stats()
+                        print(f"📊 {stats.total_searches} searches, {stats.avg_response_time:.1f}s avg, {stats.success_rate:.1f}% success")
+
+                    elif command.lower() == 'cache':
+                        stats = smart_cache.get_stats()
+                        print(f"💾 {stats['memory_entries']} entries, {stats['hit_rate']:.1f}% hit rate")
+
+                    elif command.lower() == 'clear cache':
+                        smart_cache.clear()
+                        print("✅ Cache cleared")
+
+                    elif command.startswith('search '):
+                        query = command[7:].strip()
+                        if query:
+                            search_id = str(uuid.uuid4())
+                            analytics_engine.start_search(search_id, query, "ultra-fast")
+
+                            print(f"🚀 Searching: {query}")
+                            start_time = time.time()
+
+                            try:
+                                response = asyncio.run(client.fast_comprehensive_search(
+                                    query=query,
+                                    num_sources=5,
+                                    answer_type="comprehensive"
+                                ))
+
+                                duration = time.time() - start_time
+                                analytics_engine.complete_search(search_id, True, 0.8)
+
+                                print(f"✅ Completed in {duration:.1f}s")
+                                if isinstance(response, str):
+                                    print(response[:500] + "..." if len(response) > 500 else response)
+
+                            except Exception as e:
+                                analytics_engine.record_error(search_id, e)
+                                analytics_engine.complete_search(search_id, False)
+                                print(f"❌ Error: {e}")
+
+                    elif command.startswith('fast '):
+                        query = command[5:].strip()
+                        if query:
+                            print(f"⚡ Fast search: {query}")
+                            try:
+                                response = asyncio.run(client.fast_search(
+                                    user_query=query,
+                                    num_results=3
+                                ))
+                                print(response[:300] + "..." if len(response) > 300 else response)
+                            except Exception as e:
+                                print(f"❌ Error: {e}")
+
+                    elif command.startswith('analyze '):
+                        url = command[8:].strip()
+                        if url:
+                            print(f"🔍 Analyzing: {url}")
+                            try:
+                                response = client.retrieve_and_summarize(url)
+                                print(f"📄 {response.get('summary', 'No summary available')[:200]}...")
+                            except Exception as e:
+                                print(f"❌ Error: {e}")
+
+                    elif command.strip():
+                        print("❓ Unknown command. Type 'help' for available commands.")
+
+                except KeyboardInterrupt:
+                    print("\n👋 Goodbye!")
+                    break
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+
+            return
+
+        elif args.command == "dashboard":
+            # Dashboard mode
+            try:
+                from .dashboard import start_dashboard
+                print(f"🚀 Starting WebInfo Retriever Dashboard")
+                print(f"📊 URL: http://{args.host}:{args.port}")
+                print(f"📈 Real-time analytics and monitoring")
+                print(f"🔄 Press Ctrl+C to stop")
+
+                start_dashboard(host=args.host, port=args.port, debug=args.debug)
+
+            except ImportError:
+                print("❌ Dashboard requires Flask. Install with:")
+                print("   pip install flask flask-socketio")
+                return
+            except KeyboardInterrupt:
+                print("\n👋 Dashboard stopped")
+                return
+            except Exception as e:
+                print(f"❌ Dashboard error: {e}")
+                return
+
         elif args.command == "search":
             # Join query words into natural language query
             user_query = " ".join(args.query)
+
+            # Start analytics tracking
+            search_id = str(uuid.uuid4())
+            search_type = "ultra-fast" if args.ultra_fast else "comprehensive" if args.comprehensive else "fast" if args.fast else "intelligent"
+            analytics_engine.start_search(search_id, user_query, search_type)
 
             if args.ultra_fast:
                 # Ultra-fast comprehensive search mode
                 print(f"🚀 Starting ULTRA-FAST comprehensive search for: {user_query}")
                 print("⚡ Parallel processing with streaming results...")
 
-                response = asyncio.run(client.fast_comprehensive_search(
-                    query=user_query,
-                    num_sources=args.num_results,
-                    output_format="both" if args.output_file else ("json" if args.json else "markdown"),
-                    answer_type=args.answer_type,
-                    stream_results=True
-                ))
+                try:
+                    start_time = time.time()
+                    analytics_engine.update_search_progress(search_id, sources_found=args.num_results)
 
-                if isinstance(response, dict) and "terminal_output" in response:
-                    # Display clean terminal output
-                    print(response["terminal_output"])
+                    response = asyncio.run(client.fast_comprehensive_search(
+                        query=user_query,
+                        num_sources=args.num_results,
+                        output_format="both" if args.output_file else ("json" if args.json else "markdown"),
+                        answer_type=args.answer_type,
+                        stream_results=True
+                    ))
 
-                    if args.output_file:
-                        # Save beautiful HTML/markdown report to file
-                        with open(args.output_file, 'w', encoding='utf-8') as f:
-                            f.write(response["markdown_report"])
-                        print(f"\n📄 Ultra-fast comprehensive report saved to: {args.output_file}")
-                elif isinstance(response, str):
-                    print(response)
-                    if args.output_file:
-                        with open(args.output_file, 'w', encoding='utf-8') as f:
-                            f.write(response)
-                        print(f"\n📄 Report saved to: {args.output_file}")
+                    duration = time.time() - start_time
+                    analytics_engine.complete_search(search_id, True, 0.85)
+
+                    if isinstance(response, dict) and "terminal_output" in response:
+                        # Display clean terminal output
+                        print(response["terminal_output"])
+
+                        if args.output_file:
+                            # Save beautiful HTML/markdown report to file
+                            with open(args.output_file, 'w', encoding='utf-8') as f:
+                                f.write(response["markdown_report"])
+                            print(f"\n📄 Ultra-fast comprehensive report saved to: {args.output_file}")
+                    elif isinstance(response, str):
+                        print(response)
+                        if args.output_file:
+                            with open(args.output_file, 'w', encoding='utf-8') as f:
+                                f.write(response)
+                            print(f"\n📄 Report saved to: {args.output_file}")
+
+                    print(f"\n⚡ Completed in {duration:.1f}s")
+
+                except Exception as e:
+                    analytics_engine.record_error(search_id, e, "ultra-fast search")
+                    analytics_engine.complete_search(search_id, False)
+                    raise
+
                 return
 
             elif args.comprehensive:

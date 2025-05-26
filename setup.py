@@ -5,7 +5,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="webinfo-retriever",
-    version="2.0.0",
+    version="2.1.0",
     author="JustM3Sunny",
     author_email="justaskcoding76@gmail.com",
     description="Ultra-fast comprehensive web search and AI-powered analysis with parallel processing and beautiful output formatting",
